@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.morpheus.config.StaticVariablesConfig;
 import br.com.morpheus.domain.model.Medico;
 import br.com.morpheus.domain.model.Paciente;
 import br.com.morpheus.domain.model.Sensor;
@@ -63,13 +64,11 @@ public class CustomService {
 
 	/**
 	 * Serviços Login Metodos: loginUser
-	 * 						   isMedico 
-	 * 						   isPaciente
 	 **/
 	public String loginUser(HttpSession session, String login, String senha, String userType){
 		boolean userAtorizado = false;
 		
-		if (userType.equals("Medico")) {
+		if (userType.equals(StaticVariablesConfig.TYPE_MEDICO)) {
 			log.info("Usuário é Médico.");
 			LoginUserTemplate lTemplate = new LoginAsMedico();
 			userAtorizado = lTemplate.executeLoginTemplete(session, login, senha, userType);
@@ -78,7 +77,7 @@ public class CustomService {
 				return "menu-medico";
 			} 
 		} 
-		else if (userType.equals("Paciente")) {
+		else if (userType.equals(StaticVariablesConfig.TYPE_PACIENTE)) {
 			log.info("Usuário é Paciente.");
 			LoginUserTemplate lTemplate = new LoginAsPaciente();
 			userAtorizado = lTemplate.executeLoginTemplete(session, login, senha, userType);
@@ -88,6 +87,25 @@ public class CustomService {
 			} 
 		}			
 		return "formlogin";
+	}
+	
+	public User loginUserMobile(String login, String senha){
+		User user = new User();
+		user.setLogin("-1");
+		if (loginUserMobileValidation(login, senha)) {
+			return userRepository.findOne(login);
+		}
+		return user;
+	}
+	
+	public boolean loginUserMobileValidation(String login, String senha){
+		boolean permissao = false;
+		if (userRepository.exists(login) && userRepository.findOne(login).getSenha().equals(senha)) {
+			permissao = true;
+		}else{
+			permissao = false;
+		}
+		return permissao;
 	}
 
 	/**
@@ -108,10 +126,6 @@ public class CustomService {
 	/**
 	 * Serviços para Pacientes Metodos: 
 	 **/
-	public void addMedicosParaPaciente(Paciente paciente, Iterable<Medico> medicos){
-		//TODO
-	}
-	
 	public void addSensoresParaPaciente(Paciente paciente, Iterable<Sensor> sensores){
 		//TODO
 	}

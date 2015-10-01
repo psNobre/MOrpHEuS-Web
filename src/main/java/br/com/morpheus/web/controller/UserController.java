@@ -3,10 +3,12 @@ package br.com.morpheus.web.controller;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import br.com.morpheus.domain.model.Medico;
 import br.com.morpheus.domain.model.Paciente;
 import br.com.morpheus.domain.model.User;
 import br.com.morpheus.service.CustomService;
@@ -36,5 +38,20 @@ public class UserController {
 		}
 		return "formlogin";
 	}
+	
+	/**
+	 * Controller para Médico
+	 * **/
+	@RequestMapping(value="/addPacienteParaMedico")
+	public String addPacienteParaMedico(HttpSession session, Paciente paciente) {
+		Medico medico = (Medico) session.getAttribute("userType");
+		User user = (User) session.getAttribute("userLogado"); 		
+		customService.addPacienteParaMedico(medico, user.getLogin(), paciente);		
+		return "menu-medico";
+	}
+	
+	/**
+	 * Controller para Médico
+	 * **/
 
 }
